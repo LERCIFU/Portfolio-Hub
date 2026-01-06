@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django To-Do List</title>
+</head>
+<body>
+    <h1>รายการที่ต้องทำของฉัน</h1>
+
+    <form method="POST" action="">
+        {% csrf_token %} <input type="text" name="title" placeholder="พิมพ์สิ่งที่จะทำ..." required>
+        <button type="submit">บันทึก</button>
+    </form>
+
+    <hr>
+
+   <ul>
+    {% for task in tasks %}
+        <li>
+            {{ task.title }} 
+            <a href="{% url 'delete' task.id %}" style="color: red; margin-left: 10px;">[ลบ]</a>
+        </li>
+    {% empty %}
+        <li>ยังไม่มีรายการในตอนนี้</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
