@@ -92,8 +92,7 @@
             <div class="order-header">
                 <div>
                     <span class="fw-bold text-dark">Order #{{ order.id }}</span>
-                    <span class="text-muted small ms-2"><i class="bi bi-calendar3"></i> {{ order.created_at|date:"d M
-                        Y,H:i" }}</span>
+                    <span class="text-muted small ms-2"><i class="bi bi-calendar3"></i> {{ order.created_at|date:"d MY,H:i" }}</span>
                 </div>
                 {% if order.paid %}
                 <span class="status-badge bg-success text-white">
