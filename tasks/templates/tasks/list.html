@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modern Task Board</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -16,74 +17,199 @@
             min-height: 100vh;
             color: #2d3436;
         }
+
         .glass-nav {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            position: sticky; top: 0; z-index: 1000;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
+
         .board-column {
             background: rgba(235, 236, 240, 0.6);
-            border-radius: 16px; padding: 16px; height: 100%;
-            display: flex; flex-direction: column;
-            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 16px;
+            padding: 16px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
+
         .drop-zone {
-            flex-grow: 1; min-height: 150px; padding-bottom: 20px;
+            flex-grow: 1;
+            min-height: 150px;
+            padding-bottom: 20px;
         }
+
         .task-card {
-            background: white; border-radius: 12px; border: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            background: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
             transition: all 0.3s ease;
-            position: relative; overflow: hidden; cursor: grab;
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
         }
-        .task-card:active { cursor: grabbing; }
-        .task-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); z-index: 10; }
-        .priority-strip { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-        .priority-H { background-color: #ff7675; }
-        .priority-M { background-color: #74b9ff; }
-        .priority-L { background-color: #55efc4; }
-        .sortable-ghost { opacity: 0.4; background-color: #c8d6e5; border: 2px dashed #576574; }
-        
-        #backlog-list { min-height: 100px; }
-        .btn-modern { border-radius: 50px; padding: 6px 20px; font-weight: 500; }
-        .badge-soft { background-color: #dfe6e9; color: #636e72; font-weight: 400; }
-        .form-select-glass { background-color: rgba(255,255,255,0.5); border-radius: 20px; border: 1px solid transparent; }
-        .edit-btn { color: #b2bec3; transition: 0.2s; }
-        .edit-btn:hover { color: #0984e3; }
+
+        .task-card:active {
+            cursor: grabbing;
+        }
+
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .priority-strip {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .priority-H {
+            background-color: #ff7675;
+        }
+
+        .priority-M {
+            background-color: #74b9ff;
+        }
+
+        .priority-L {
+            background-color: #55efc4;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #c8d6e5;
+            border: 2px dashed #576574;
+        }
+
+        #backlog-list {
+            min-height: 100px;
+        }
+
+        .btn-modern {
+            border-radius: 50px;
+            padding: 6px 20px;
+            font-weight: 500;
+        }
+
+        .badge-soft {
+            background-color: #dfe6e9;
+            color: #636e72;
+            font-weight: 400;
+        }
+
+        .form-select-glass {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            border: 1px solid transparent;
+        }
+
+        .edit-btn {
+            color: #b2bec3;
+            transition: 0.2s;
+        }
+
+        .edit-btn:hover {
+            color: #0984e3;
+        }
     </style>
 </head>
+
 <body>
 
     <nav class="navbar navbar-expand-lg glass-nav mb-4 py-3 shadow-sm">
         <div class="container-fluid px-3 px-md-4">
-            
             <div class="d-flex align-items-center">
-                <a href="/" class="btn btn-sm btn-outline-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                <a href="/"
+                    class="btn btn-sm btn-outline-secondary rounded-circle me-2 d-flex align-items-center justify-content-center"
+                    style="width: 35px; height: 35px;">
                     <i class="bi bi-grid-fill"></i>
                 </a>
                 <span class="navbar-brand fw-bold fs-4 text-primary m-0">Sprint Board</span>
             </div>
 
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarContent">
                 <div class="d-flex flex-column flex-lg-row align-items-lg-center ms-auto gap-3">
-                    
+
                     <form method="get" class="d-flex align-items-center w-100">
-                        <select name="sprint" class="form-select form-select-glass fw-bold text-dark w-100" onchange="this.form.submit()">
+                        <select name="sprint" class="form-select form-select-glass fw-bold text-dark w-100"
+                            onchange="this.form.submit()">
                             <option value="" disabled selected>📂 Switch Sprint...</option>
                             <option value="" class="fw-bold text-primary">⚡ Current Active</option>
                             <option disabled>──────────</option>
                             {% for s in all_sprints %}
-                                <option value="{{ s.id }}" {% if active_sprint.id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                            <option value="{{ s.id }}" {% if active_sprint.id == s.id %}selected{% endif %}>{{ s.name }}
+                            </option>
                             {% endfor %}
                         </select>
                     </form>
 
-                    <a href="{% url 'tasks:add_sprint' %}" class="btn btn-warning btn-modern text-dark shadow-sm w-100">
+                    <div class="dropdown d-inline-block me-2">
+                        <button class="btn btn-white shadow-sm dropdown-toggle rounded-pill px-3 fw-bold text-secondary"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if current_team %}
+                            👥 {{ current_team.name }}
+                            {% else %}
+                            👤 Personal Space
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu border-0 shadow-lg rounded-4 p-2">
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 fw-bold" href="{% url 'tasks:board' %}">
+                                    👤 Personal Space
+                                </a>
+                            </li>
+
+                            {% if my_teams %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <h6 class="dropdown-header text-uppercase small fw-bold text-muted">My Teams</h6>
+                            </li>
+                            {% for team in my_teams %}
+                            <li>
+                                <div class="d-flex justify-content-between align-items-center pe-2">
+                                    <a class="dropdown-item rounded-3 py-2 flex-grow-1"
+                                    href="{% url 'tasks:board' %}?team_id={{ team.id }}">
+                                        👥 {{ team.name }}
+                                    </a>
+                                    
+                                    <a href="{% url 'tasks:manage_team' team.id %}" 
+                                    class="text-secondary p-2 rounded-circle ms-1"
+                                    style="transition: 0.2s;" 
+                                    onmouseover="this.style.backgroundColor='#f0f0f0'" 
+                                    onmouseout="this.style.backgroundColor='transparent'"
+                                    title="Manage Team">
+                                        <i class="bi bi-gear-fill"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            {% endfor %}
+                            {% else %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><span class="dropdown-item-text text-muted small">No teams yet</span></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <a href="{% url 'tasks:add_sprint' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}"
+                        class="btn btn-warning btn-modern text-dark shadow-sm w-100">
                         <i class="bi bi-rocket-takeoff-fill"></i> New Sprint
                     </a>
                 </div>
@@ -93,27 +219,30 @@
     </nav>
 
     <div class="container-fluid px-4 pb-5">
-        
+
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
                 {% if active_sprint %}
-                    <h6 class="text-muted text-uppercase fw-bold ls-1 mb-1">Current Workspace</h6>
-                    <h1 class="fw-bold display-6 mb-0">{{ active_sprint.name }}</h1>
-                    <p class="text-secondary mt-2 mb-0">
-                        <i class="bi bi-bullseye text-danger me-1"></i> Goal: {{ active_sprint.goal|default:"No specific goal" }}
-                        <span class="mx-2 text-muted">|</span>
-                        <i class="bi bi-calendar3 me-1"></i> {{ active_sprint.start_date|date:"d M" }} - {{ active_sprint.end_date|date:"d M" }}
-                    </p>
+                <h6 class="text-muted text-uppercase fw-bold ls-1 mb-1">Current Workspace</h6>
+                <h1 class="fw-bold display-6 mb-0">{{ active_sprint.name }}</h1>
+                <p class="text-secondary mt-2 mb-0">
+                    <i class="bi bi-bullseye text-danger me-1"></i> Goal: {{ active_sprint.goal|default:"No specific goal" }}
+                    <span class="mx-2 text-muted">|</span>
+                    <i class="bi bi-calendar3 me-1"></i> {{ active_sprint.start_date|date:"d M" }} - {{ active_sprint.end_date|date:"d M" }}
+                </p>
                 {% else %}
-                    <h1 class="fw-bold text-secondary">💤 No Active Sprint</h1>
+                <h1 class="fw-bold text-secondary">💤 No Active Sprint</h1>
                 {% endif %}
             </div>
-            <a href="{% url 'tasks:add_task' %}" class="btn btn-primary btn-modern shadow"><i class="bi bi-plus-lg me-1"></i> New Task</a>
+            <a href="{% url 'tasks:add_task' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}" 
+                class="btn btn-primary btn-modern shadow">
+                <i class="bi bi-plus-lg me-1"></i> New Task
+            </a>
         </div>
 
         {% if active_sprint %}
         <div class="row g-4">
-            
+
             <div class="col-md-4">
                 <div class="board-column">
                     <div class="d-flex justify-content-between mb-3 px-2">
@@ -122,18 +251,22 @@
                     </div>
                     <div id="todo-list" class="drop-zone" data-status="TODO" data-sprint-id="{{ active_sprint.id }}">
                         {% for task in tasks_todo %}
-                            <div class="card task-card mb-3 p-3" data-task-id="{{ task.id }}">
-                                <div class="priority-strip priority-{{ task.priority }}"></div>
-                                {% if task.source %}<div class="mb-2"><span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill" style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div style="width: 100%;">
-                                        <h6 class="fw-bold mb-1 text-dark">{{ task.title }}</h6>
-                                        <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{ task.description|default:"-" }}</p>
-                                        <span class="badge bg-light text-dark border rounded-pill" style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
-                                    </div>
-                                    <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i class="bi bi-pencil-square"></i></a>
+                        <div class="card task-card mb-3 p-3" data-task-id="{{ task.id }}">
+                            <div class="priority-strip priority-{{ task.priority }}"></div>
+                            {% if task.source %}<div class="mb-2"><span
+                                    class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill"
+                                    style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div style="width: 100%;">
+                                    <h6 class="fw-bold mb-1 text-dark">{{ task.title }}</h6>
+                                    <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{ task.description|default:"-" }}</p>
+                                    <span class="badge bg-light text-dark border rounded-pill"
+                                        style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
                                 </div>
+                                <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
+                                        class="bi bi-pencil-square"></i></a>
                             </div>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -145,20 +278,26 @@
                         <span class="fw-bold text-primary">⚡ IN PROGRESS</span>
                         <span id="inprogress-count" class="badge bg-primary rounded-pill">{{ tasks_in_progress.count }}</span>
                     </div>
-                    <div id="inprogress-list" class="drop-zone" data-status="IN_PROGRESS" data-sprint-id="{{ active_sprint.id }}">
+                    <div id="inprogress-list" class="drop-zone" data-status="IN_PROGRESS"
+                        data-sprint-id="{{ active_sprint.id }}">
                         {% for task in tasks_in_progress %}
-                            <div class="card task-card mb-3 p-3 border-primary shadow-sm" data-task-id="{{ task.id }}">
-                                <div class="priority-strip priority-{{ task.priority }}"></div>
-                                {% if task.source %}<div class="mb-2"><span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill" style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div style="width: 100%;">
-                                        <h6 class="fw-bold mb-1">{{ task.title }}</h6>
-                                        <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{ task.description|default:"-" }}</p>
-                                        <span class="badge bg-light text-dark border rounded-pill" style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
-                                    </div>
-                                    <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i class="bi bi-pencil-square"></i></a>
+                        <div class="card task-card mb-3 p-3 border-primary shadow-sm" data-task-id="{{ task.id }}">
+                            <div class="priority-strip priority-{{ task.priority }}"></div>
+                            {% if task.source %}<div class="mb-2"><span
+                                    class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill"
+                                    style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div style="width: 100%;">
+                                    <h6 class="fw-bold mb-1">{{ task.title }}</h6>
+                                    <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{
+                                        task.description|default:"-" }}</p>
+                                    <span class="badge bg-light text-dark border rounded-pill"
+                                        style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
                                 </div>
+                                <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
+                                        class="bi bi-pencil-square"></i></a>
                             </div>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -172,19 +311,25 @@
                     </div>
                     <div id="done-list" class="drop-zone" data-status="DONE" data-sprint-id="{{ active_sprint.id }}">
                         {% for task in tasks_done %}
-                            <div class="card task-card mb-2 p-3 opacity-75" data-task-id="{{ task.id }}">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="d-flex align-items-start" style="width: 100%;">
-                                        <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 24px; height: 24px; min-width: 24px;"><i class="bi bi-check" style="font-size: 1.2rem;"></i></div>
-                                        <div style="width: 100%;">
-                                            {% if task.source %}<span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-1 py-0 mb-1 rounded-1" style="font-size: 0.6rem;">From {{ task.source }}</span><br>{% endif %}
-                                            <h6 class="text-decoration-line-through text-muted mb-0">{{ task.title }}</h6>
-                                            <p class="text-decoration-line-through text-muted small mb-0 mt-1 text-truncate" style="max-width: 95%;">{{ task.description|default:"" }}</p>
-                                        </div>
+                        <div class="card task-card mb-2 p-3 opacity-75" data-task-id="{{ task.id }}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex align-items-start" style="width: 100%;">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                        style="width: 24px; height: 24px; min-width: 24px;"><i class="bi bi-check"
+                                            style="font-size: 1.2rem;"></i></div>
+                                    <div style="width: 100%;">
+                                        {% if task.source %}<span
+                                            class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-1 py-0 mb-1 rounded-1"
+                                            style="font-size: 0.6rem;">From {{ task.source }}</span><br>{% endif %}
+                                        <h6 class="text-decoration-line-through text-muted mb-0">{{ task.title }}</h6>
+                                        <p class="text-decoration-line-through text-muted small mb-0 mt-1 text-truncate"
+                                            style="max-width: 95%;">{{ task.description|default:"" }}</p>
                                     </div>
-                                    <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i class="bi bi-pencil-square"></i></a>
                                 </div>
+                                <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
+                                        class="bi bi-pencil-square"></i></a>
                             </div>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -195,27 +340,31 @@
 
         <div class="mt-5">
             <h6 class="text-muted fw-bold text-uppercase ls-1 mb-3"><i class="bi bi-archive me-2"></i>Backlog Items</h6>
-            <div id="backlog-list" class="bg-white rounded-4 shadow-sm p-3 drop-zone" 
-                 data-status="TODO" 
-                 data-sprint-id="">
-                 
+            <div id="backlog-list" class="bg-white rounded-4 shadow-sm p-3 drop-zone" data-status="TODO"
+                data-sprint-id="">
+
                 {% for task in backlog_tasks %}
-                    <div class="card task-card mb-3 p-3" data-task-id="{{ task.id }}">
-                        <div class="priority-strip priority-{{ task.priority }}"></div>
-                        {% if task.source %}<div class="mb-2"><span class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill" style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div style="width: 100%;">
-                                <h6 class="fw-bold mb-1 text-dark">{{ task.title }}</h6>
-                                <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{ task.description|default:"-" }}</p>
-                                <span class="badge bg-light text-dark border rounded-pill" style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
-                            </div>
-                            <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i class="bi bi-pencil-square"></i></a>
+                <div class="card task-card mb-3 p-3" data-task-id="{{ task.id }}">
+                    <div class="priority-strip priority-{{ task.priority }}"></div>
+                    {% if task.source %}<div class="mb-2"><span
+                            class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill"
+                            style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div style="width: 100%;">
+                            <h6 class="fw-bold mb-1 text-dark">{{ task.title }}</h6>
+                            <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{
+                                task.description|default:"-" }}</p>
+                            <span class="badge bg-light text-dark border rounded-pill" style="font-size: 0.7rem;">{{
+                                task.story_points }} pts</span>
                         </div>
+                        <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
+                                class="bi bi-pencil-square"></i></a>
                     </div>
+                </div>
                 {% endfor %}
-                
-                <div id="backlog-empty-msg" class="p-4 text-center text-muted small" 
-                     style="{% if backlog_tasks %}display: none;{% endif %}">
+
+                <div id="backlog-empty-msg" class="p-4 text-center text-muted small"
+                    style="{% if backlog_tasks %}display: none;{% endif %}">
                     No backlog items. Clean slate! ✨
                 </div>
             </div>
@@ -252,7 +401,7 @@
             ];
 
             function updateBadgeCounts() {
-                if(document.getElementById('todo-count')) {
+                if (document.getElementById('todo-count')) {
                     document.getElementById('todo-count').textContent = document.querySelectorAll('#todo-list .task-card').length;
                     document.getElementById('inprogress-count').textContent = document.querySelectorAll('#inprogress-list .task-card').length;
                     document.getElementById('done-count').textContent = document.querySelectorAll('#done-list .task-card').length;
@@ -283,7 +432,7 @@
                     delay: 100,
                     delayOnTouchOnly: true,
                     // 🔥 เพิ่ม Filter: เพื่อไม่ให้ข้อความ Empty โดนลากติดมือมาด้วย
-                    filter: '#backlog-empty-msg', 
+                    filter: '#backlog-empty-msg',
 
                     onEnd: function (evt) {
                         const itemEl = evt.item;
@@ -295,17 +444,17 @@
                         fetch('/tasks/api/move-task/', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
-                            body: JSON.stringify({ 
-                                task_id: taskId, 
+                            body: JSON.stringify({
+                                task_id: taskId,
                                 status: newStatus,
                                 sprint_id: newSprintId
                             })
                         })
-                        .then(response => response.json())
-                        .then(data => { 
-                            if (!data.success) alert('Failed: ' + data.error);
-                        })
-                        .catch(error => console.error('Error:', error));
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) alert('Failed: ' + data.error);
+                            })
+                            .catch(error => console.error('Error:', error));
 
                         updateBadgeCounts();
                         checkEmptyBacklog(); // 🔥 เช็คทุกครั้งที่วางงาน
@@ -315,4 +464,5 @@
         });
     </script>
 </body>
+
 </html>

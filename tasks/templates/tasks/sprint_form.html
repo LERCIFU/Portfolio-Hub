@@ -42,6 +42,8 @@
                     <form method="post">
                         {% csrf_token %}
 
+                        <input type="hidden" name="team_id" value="{{ request.GET.team_id }}">
+
                         {% if form.errors %}
                             <div class="alert alert-danger rounded-4 shadow-sm">
                                 <ul class="mb-0 ps-3 small">
@@ -95,7 +97,8 @@
                             <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow fw-bold">
                                 {{ button_text|default:"Save Sprint" }}
                             </button>
-                            <a href="{% url 'tasks:board' %}" class="btn btn-light btn-lg rounded-pill text-secondary fw-bold">Cancel</a>
+                            <a href="{% url 'tasks:board' %}{% if request.GET.team_id %}?team_id={{ request.GET.team_id }}{% endif %}" 
+                               class="btn btn-light btn-lg rounded-pill text-secondary fw-bold">Cancel</a>
                         </div>
 
                     </form>
