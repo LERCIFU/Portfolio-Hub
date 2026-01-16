@@ -95,7 +95,7 @@
                             <button 
                                 type="button" 
                                 class="btn btn-success w-100 py-2 fw-bold shadow-sm"
-                                onclick="confirmCheckout()"
+                                onclick="confirmCheckout(this)"
                             >
                                 ✅ ยืนยันการสั่งซื้อ
                             </button>
@@ -119,25 +119,27 @@
 </html>
 
 <script>
-    function confirmCheckout() {
-        Swal.fire({
-            title: 'ยืนยันการสั่งซื้อ?',
-            text: "คุณตรวจสอบรายการสินค้าเรียบร้อยแล้วใช่ไหม?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#198754', // สีเขียวเหมือนปุ่ม Bootstrap
-            cancelButtonColor: '#d33',    // สีแดง
-            confirmButtonText: 'ใช่, สั่งเลย!',
-            cancelButtonText: 'ยกเลิก',
-            background: '#fff',           // พื้นหลัง
-            backdrop: `
-                rgba(0,0,123,0.4)
-            `
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // ถ้ากดตกลง -> สั่งให้ฟอร์มส่งข้อมูล
-                document.getElementById('checkout-form').submit();
+    function confirmCheckout(btn) { // 👈 รับค่า btn (ปุ่ม) เข้ามา
+    Swal.fire({
+        title: 'ยืนยันการสั่งซื้อ?',
+        text: "คุณตรวจสอบรายการสินค้าเรียบร้อยแล้วใช่ไหม?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#198754',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ใช่, สั่งเลย!',
+        cancelButtonText: 'ยกเลิก',
+        background: '#fff'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // ✅ ให้ปุ่มมองหา "ฟอร์มพ่อ" ของมันเอง (ไม่ต้องง้อ ID แล้ว)
+            const form = btn.closest('form');
+            if (form) {
+                form.submit();
+            } else {
+                Swal.fire('Error', 'ไม่พบฟอร์มสำหรับการส่งข้อมูล', 'error');
             }
-        })
-    }
+        }
+    })
+}
 </script>
