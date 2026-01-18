@@ -43,17 +43,8 @@
             padding-bottom: 20px;
         }
 
-        .task-card {
-            background: white;
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            cursor: grab;
-        }
-
+        /* Styles for task-card are now handled inside the partial file, 
+           but keeping these for container behavior */
         .task-card:active {
             cursor: grabbing;
         }
@@ -62,26 +53,6 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             z-index: 10;
-        }
-
-        .priority-strip {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-        }
-
-        .priority-H {
-            background-color: #ff7675;
-        }
-
-        .priority-M {
-            background-color: #74b9ff;
-        }
-
-        .priority-L {
-            background-color: #55efc4;
         }
 
         .sortable-ghost {
@@ -145,6 +116,11 @@
                 <div class="d-flex flex-column flex-lg-row align-items-lg-center ms-auto gap-3">
 
                     <form method="get" class="d-flex align-items-center w-100">
+    
+                        {% if current_team %}
+                            <input type="hidden" name="team_id" value="{{ current_team.id }}">
+                        {% endif %}
+
                         <select name="sprint" class="form-select form-select-glass fw-bold text-dark w-100"
                             onchange="this.form.submit()">
                             <option value="" disabled selected>📂 Switch Sprint...</option>
@@ -183,19 +159,18 @@
                             {% for team in my_teams %}
                             <li>
                                 <div class="d-flex justify-content-between align-items-center pe-2">
-                                    <a class="dropdown-item rounded-3 py-2 flex-grow-1"
-                                    href="{% url 'tasks:board' %}?team_id={{ team.id }}">
+                                    <a class="dropdown-item rounded-3 py-2 flex-grow-1" href="{% url 'tasks:board' %}?team_id={{ team.id }}">
                                         👥 {{ team.name }}
                                     </a>
-                                    
-                                    <a href="{% url 'tasks:manage_team' team.id %}" 
-                                    class="text-secondary p-2 rounded-circle ms-1"
-                                    style="transition: 0.2s;" 
-                                    onmouseover="this.style.backgroundColor='#f0f0f0'" 
-                                    onmouseout="this.style.backgroundColor='transparent'"
-                                    title="Manage Team">
-                                        <i class="bi bi-gear-fill"></i>
-                                    </a>
+
+                                    {% if current_user_role != 'MEMBER' or current_team.id != team.id %}
+                                        <a href="{% url 'tasks:manage_team' team.id %}" 
+                                        class="text-secondary p-2 rounded-circle ms-1" 
+                                        style="transition: 0.2s;" 
+                                        title="Manage Team">
+                                            <i class="bi bi-gear-fill"></i>
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </li>
                             {% endfor %}
@@ -208,10 +183,12 @@
                         </ul>
                     </div>
 
-                    <a href="{% url 'tasks:add_sprint' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}"
-                        class="btn btn-warning btn-modern text-dark shadow-sm w-100">
-                        <i class="bi bi-rocket-takeoff-fill"></i> New Sprint
-                    </a>
+                    {% if current_user_role != 'MEMBER' %}
+                        <a href="{% url 'tasks:add_sprint' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}"
+                            class="btn btn-warning btn-modern text-dark shadow-sm w-100">
+                            <i class="bi bi-rocket-takeoff-fill"></i> New Sprint
+                        </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -226,15 +203,17 @@
                 <h6 class="text-muted text-uppercase fw-bold ls-1 mb-1">Current Workspace</h6>
                 <h1 class="fw-bold display-6 mb-0">{{ active_sprint.name }}</h1>
                 <p class="text-secondary mt-2 mb-0">
-                    <i class="bi bi-bullseye text-danger me-1"></i> Goal: {{ active_sprint.goal|default:"No specific goal" }}
+                    <i class="bi bi-bullseye text-danger me-1"></i> Goal:
+                    {{ active_sprint.goal|default:"No specific goal" }}
                     <span class="mx-2 text-muted">|</span>
-                    <i class="bi bi-calendar3 me-1"></i> {{ active_sprint.start_date|date:"d M" }} - {{ active_sprint.end_date|date:"d M" }}
+                    <i class="bi bi-calendar3 me-1"></i> {{ active_sprint.start_date|date:"d M" }} -
+                    {{ active_sprint.end_date|date:"d M" }}
                 </p>
                 {% else %}
                 <h1 class="fw-bold text-secondary">💤 No Active Sprint</h1>
                 {% endif %}
             </div>
-            <a href="{% url 'tasks:add_task' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}" 
+            <a href="{% url 'tasks:add_task' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}"
                 class="btn btn-primary btn-modern shadow">
                 <i class="bi bi-plus-lg me-1"></i> New Task
             </a>
@@ -251,22 +230,7 @@
                     </div>
                     <div id="todo-list" class="drop-zone" data-status="TODO" data-sprint-id="{{ active_sprint.id }}">
                         {% for task in tasks_todo %}
-                        <div class="card task-card mb-3 p-3" data-task-id="{{ task.id }}">
-                            <div class="priority-strip priority-{{ task.priority }}"></div>
-                            {% if task.source %}<div class="mb-2"><span
-                                    class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill"
-                                    style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div style="width: 100%;">
-                                    <h6 class="fw-bold mb-1 text-dark">{{ task.title }}</h6>
-                                    <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{ task.description|default:"-" }}</p>
-                                    <span class="badge bg-light text-dark border rounded-pill"
-                                        style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
-                                </div>
-                                <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
-                                        class="bi bi-pencil-square"></i></a>
-                            </div>
-                        </div>
+                            {% include 'tasks/partials/task_card.html' with task=task %}
                         {% endfor %}
                     </div>
                 </div>
@@ -276,27 +240,13 @@
                 <div class="board-column" style="background: rgba(225, 245, 254, 0.5);">
                     <div class="d-flex justify-content-between mb-3 px-2">
                         <span class="fw-bold text-primary">⚡ IN PROGRESS</span>
-                        <span id="inprogress-count" class="badge bg-primary rounded-pill">{{ tasks_in_progress.count }}</span>
+                        <span id="inprogress-count"
+                            class="badge bg-primary rounded-pill">{{ tasks_in_progress.count }}</span>
                     </div>
                     <div id="inprogress-list" class="drop-zone" data-status="IN_PROGRESS"
                         data-sprint-id="{{ active_sprint.id }}">
                         {% for task in tasks_in_progress %}
-                        <div class="card task-card mb-3 p-3 border-primary shadow-sm" data-task-id="{{ task.id }}">
-                            <div class="priority-strip priority-{{ task.priority }}"></div>
-                            {% if task.source %}<div class="mb-2"><span
-                                    class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill"
-                                    style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div style="width: 100%;">
-                                    <h6 class="fw-bold mb-1">{{ task.title }}</h6>
-                                    <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{ task.description|default:"-" }}</p>
-                                    <span class="badge bg-light text-dark border rounded-pill"
-                                        style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
-                                </div>
-                                <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
-                                        class="bi bi-pencil-square"></i></a>
-                            </div>
-                        </div>
+                            {% include 'tasks/partials/task_card.html' with task=task %}
                         {% endfor %}
                     </div>
                 </div>
@@ -310,25 +260,7 @@
                     </div>
                     <div id="done-list" class="drop-zone" data-status="DONE" data-sprint-id="{{ active_sprint.id }}">
                         {% for task in tasks_done %}
-                        <div class="card task-card mb-2 p-3 opacity-75" data-task-id="{{ task.id }}">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div class="d-flex align-items-start" style="width: 100%;">
-                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                                        style="width: 24px; height: 24px; min-width: 24px;"><i class="bi bi-check"
-                                            style="font-size: 1.2rem;"></i></div>
-                                    <div style="width: 100%;">
-                                        {% if task.source %}<span
-                                            class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-1 py-0 mb-1 rounded-1"
-                                            style="font-size: 0.6rem;">From {{ task.source }}</span><br>{% endif %}
-                                        <h6 class="text-decoration-line-through text-muted mb-0">{{ task.title }}</h6>
-                                        <p class="text-decoration-line-through text-muted small mb-0 mt-1 text-truncate"
-                                            style="max-width: 95%;">{{ task.description|default:"" }}</p>
-                                    </div>
-                                </div>
-                                <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
-                                        class="bi bi-pencil-square"></i></a>
-                            </div>
-                        </div>
+                            {% include 'tasks/partials/task_card.html' with task=task %}
                         {% endfor %}
                     </div>
                 </div>
@@ -343,21 +275,7 @@
                 data-sprint-id="">
 
                 {% for task in backlog_tasks %}
-                <div class="card task-card mb-3 p-3" data-task-id="{{ task.id }}">
-                    <div class="priority-strip priority-{{ task.priority }}"></div>
-                    {% if task.source %}<div class="mb-2"><span
-                            class="badge bg-warning bg-opacity-25 text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill"
-                            style="font-size: 0.65rem;">From {{ task.source }}</span></div>{% endif %}
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div style="width: 100%;">
-                            <h6 class="fw-bold mb-1 text-dark">{{ task.title }}</h6>
-                            <p class="text-muted small mb-2 text-truncate" style="max-width: 95%;">{{ task.description|default:"-" }}</p>
-                            <span class="badge bg-light text-dark border rounded-pill" style="font-size: 0.7rem;">{{ task.story_points }} pts</span>
-                        </div>
-                        <a href="{% url 'tasks:edit_task' task.id %}" class="edit-btn ms-2"><i
-                                class="bi bi-pencil-square"></i></a>
-                    </div>
-                </div>
+                    {% include 'tasks/partials/task_card.html' with task=task %}
                 {% endfor %}
 
                 <div id="backlog-empty-msg" class="p-4 text-center text-muted small"
@@ -405,7 +323,6 @@
                 }
             }
 
-            // 🔥 ฟังก์ชันเช็คว่า Backlog ว่างไหม (เพื่อซ่อน/โชว์ข้อความ)
             function checkEmptyBacklog() {
                 const backlogList = document.getElementById('backlog-list');
                 const emptyMsg = document.getElementById('backlog-empty-msg');
@@ -428,7 +345,6 @@
                     ghostClass: 'sortable-ghost',
                     delay: 100,
                     delayOnTouchOnly: true,
-                    // 🔥 เพิ่ม Filter: เพื่อไม่ให้ข้อความ Empty โดนลากติดมือมาด้วย
                     filter: '#backlog-empty-msg',
 
                     onEnd: function (evt) {
@@ -447,14 +363,25 @@
                                 sprint_id: newSprintId
                             })
                         })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.success) alert('Failed: ' + data.error);
-                            })
-                            .catch(error => console.error('Error:', error));
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // ✨ ส่วนสำคัญ: รับ HTML ใหม่มาสวมร่างเดิมทันที
+                                if (data.html) {
+                                    itemEl.outerHTML = data.html;
+                                }
+                                // อัปเดตตัวเลข
+                                updateBadgeCounts();
+                                checkEmptyBacklog();
+                            } else {
+                                alert('Failed: ' + data.error);
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
 
+                        // อัปเดต UI ชั่วคราวไปก่อน (เผื่อเน็ตช้า)
                         updateBadgeCounts();
-                        checkEmptyBacklog(); // 🔥 เช็คทุกครั้งที่วางงาน
+                        checkEmptyBacklog();
                     }
                 });
             });

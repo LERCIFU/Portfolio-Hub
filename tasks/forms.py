@@ -1,36 +1,65 @@
 from django import forms
-from .models import Task, Sprint
+from .models import Task, Sprint, Team
 
+# ==========================================
+# 1. Task Form (จัดการงาน)
+# ==========================================
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['title', 'description', 'priority', 'story_points', 'sprint']
+        fields = ['title', 'description', 'status', 'priority', 'story_points', 'assignee']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ชื่องาน...'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ชื่องาน (Task Title)'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'รายละเอียด...'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
             'priority': forms.Select(attrs={'class': 'form-select'}),
-            'story_points': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'story_points': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'assignee': forms.Select(attrs={'class': 'form-select'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        # 🔥 ดึง team_id ที่ส่งมาจาก views.py (ต้องดึงออกก่อนเรียก super)
+        team_id = kwargs.pop('team_id', None) 
+        super(TaskForm, self).__init__(*args, **kwargs)
+
+        # 🔥 Logic กรองคนรับงาน (Assignee)
+        if team_id:
+            # กรณีอยู่ในทีม: ให้เลือกได้เฉพาะสมาชิกในทีมนั้น
+            try:
+                team = Team.objects.get(id=team_id)
+                # ดึงเฉพาะ User ที่อยู่ในทีมนี้
+                self.fields['assignee'].queryset = team.members.all()
+                self.fields['assignee'].empty_label = "--- Unassigned (ยังไม่ระบุคน) ---"
+            except Team.DoesNotExist:
+                # กันเหนียวเผื่อหาทีมไม่เจอ
+                self.fields['assignee'].queryset = team.members.none()
+        else:
+            # กรณีส่วนตัว: ซ่อนช่อง Assignee ไปเลย (เพราะคืองานของตัวเอง)
+            self.fields['assignee'].widget = forms.HiddenInput()
+
+
+# ==========================================
+# 2. Sprint Form (จัดการ Sprint)
+# ==========================================
 class SprintForm(forms.ModelForm):
     class Meta:
         model = Sprint
-        # 👇 จุดสำคัญ: ต้องมี 'is_active' ในนี้ครับ (ลำดับมีผลต่อการเรียงหน้าเว็บ)
-        fields = ['name', 'goal', 'start_date', 'end_date', 'is_active'] 
-        
+        fields = ['name', 'goal', 'start_date', 'end_date']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'เช่น Sprint #2: Bug Fixes'}),
-            'goal': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'เป้าหมายในรอบนี้...'}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ชื่อ Sprint (เช่น Sprint 1)'}),
+            'goal': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'เป้าหมายของรอบนี้...'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            # 👇 ตัว Checkbox
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'width: 20px; height: 20px;'}), 
         }
-        
-        labels = {
-            'name': 'Sprint Name',
-            'goal': 'Sprint Goal',
-            'start_date': 'Start Date',
-            'end_date': 'End Date',
-            'is_active': 'Set as Current Sprint immediately? (เริ่มทันทีเลยไหม?)',
+
+
+# ==========================================
+# 3. Team Form (สร้างทีมใหม่)
+# ==========================================
+class TeamForm(forms.ModelForm):
+    class Meta:
+        model = Team
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ตั้งชื่อทีมของคุณ (เช่น Dream Team)'})
         }

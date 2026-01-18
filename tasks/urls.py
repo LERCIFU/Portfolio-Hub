@@ -12,6 +12,7 @@ urlpatterns = [
     path('edit/<int:task_id>/', views.edit_task, name='edit_task'),
     path('api/move-task/', views.move_task_api, name='move_task_api'),
     path('delete/<int:task_id>/', views.delete_task, name='delete_task'),
+    path('create-team/', views.create_team, name='create_team'),
     path('team/<int:team_id>/manage/', views.manage_team, name='manage_team'),
     path('team/<int:team_id>/remove/<int:user_id>/', views.remove_team_member, name='remove_team_member'),
 
