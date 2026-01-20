@@ -138,6 +138,6 @@ CLOUDINARY_STORAGE = {
 # บอก Django ว่าถ้าเป็นไฟล์ Media (รูปอัปโหลด) ให้ไปฝากไว้ที่ Cloudinary
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-LOGIN_REDIRECT_URL = '/' # Login เสร็จให้ไปหน้าร้าน
-LOGOUT_REDIRECT_URL = '/'       # Logout เสร็จให้กลับมาหน้า Login
+LOGIN_REDIRECT_URL = '/' 
+LOGOUT_REDIRECT_URL = '/'     
 

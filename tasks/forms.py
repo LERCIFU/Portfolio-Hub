@@ -44,12 +44,15 @@ class TaskForm(forms.ModelForm):
 class SprintForm(forms.ModelForm):
     class Meta:
         model = Sprint
-        fields = ['name', 'goal', 'start_date', 'end_date']
+        # 🔥 1. เพิ่ม 'is_active' เข้าไปใน list
+        fields = ['name', 'goal', 'start_date', 'end_date', 'is_active'] 
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ชื่อ Sprint (เช่น Sprint 1)'}),
             'goal': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'เป้าหมายของรอบนี้...'}),
             'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            # 🔥 2. เพิ่ม Widget สำหรับ Checkbox
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input me-2'}), 
         }
 
 

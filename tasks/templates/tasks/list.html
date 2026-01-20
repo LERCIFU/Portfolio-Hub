@@ -180,7 +180,24 @@
                             </li>
                             <li><span class="dropdown-item-text text-muted small">No teams yet</span></li>
                             {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+    
+                            <li>
+                                <a class="dropdown-item rounded-3 py-2 text-primary fw-bold d-flex align-items-center gap-2" 
+                                href="{% url 'tasks:create_team' %}">
+                                    <i class="bi bi-plus-circle-fill"></i> Create New Team
+                                </a>
+                            </li>
                         </ul>
+                    </div>
+
+                    <div class="d-flex flex-column flex-lg-row align-items-lg-center ms-auto gap-3">
+    
+                    <a href="{% url 'tasks:dashboard' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}" 
+                    class="btn btn-light shadow-sm text-primary fw-bold rounded-pill border">
+                        <i class="bi bi-graph-up-arrow"></i> Dashboard
+                    </a>
+
                     </div>
 
                     {% if current_user_role != 'MEMBER' %}
@@ -197,27 +214,60 @@
 
     <div class="container-fluid px-4 pb-5">
 
-        <div class="d-flex justify-content-between align-items-end mb-4">
+        {% if active_sprint %}
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
-                {% if active_sprint %}
-                <h6 class="text-muted text-uppercase fw-bold ls-1 mb-1">Current Workspace</h6>
-                <h1 class="fw-bold display-6 mb-0">{{ active_sprint.name }}</h1>
-                <p class="text-secondary mt-2 mb-0">
-                    <i class="bi bi-bullseye text-danger me-1"></i> Goal:
-                    {{ active_sprint.goal|default:"No specific goal" }}
-                    <span class="mx-2 text-muted">|</span>
-                    <i class="bi bi-calendar3 me-1"></i> {{ active_sprint.start_date|date:"d M" }} -
-                    {{ active_sprint.end_date|date:"d M" }}
-                </p>
-                {% else %}
-                <h1 class="fw-bold text-secondary">💤 No Active Sprint</h1>
-                {% endif %}
+                <h4 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    🚀 {{ active_sprint.name }}
+                    
+                    <span class="badge bg-light text-dark border" style="font-size: 0.6em;">
+                        {{ active_sprint.start_date|date:"d M" }} - {{ active_sprint.end_date|date:"d M" }}
+                    </span>
+
+                    {% if active_sprint.is_active %}
+                        <span class="badge bg-success" style="font-size: 0.5em;">ACTIVE</span>
+                    {% else %}
+                        <span class="badge bg-secondary" style="font-size: 0.5em;">PLANNED</span>
+                    {% endif %}
+                </h4>
+                <small class="text-muted">{{ active_sprint.goal|default:"No Goal Set" }}</small>
             </div>
-            <a href="{% url 'tasks:add_task' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}"
-                class="btn btn-primary btn-modern shadow">
-                <i class="bi bi-plus-lg me-1"></i> New Task
-            </a>
+
+            {% if current_user_role != 'MEMBER' %}
+            <div class="d-flex align-items-center gap-1">
+                
+                {% if active_sprint.is_active %}
+                    <a href="{% url 'tasks:complete_sprint' active_sprint.id %}" 
+                    class="btn btn-success btn-sm fw-bold shadow-sm me-2"
+                    onclick="return confirm('🏁 จบ Sprint นี้เลยไหม?\n(งานที่ค้างจะถูกย้ายไป Backlog)');">
+                        <i class="bi bi-flag-fill"></i> Complete
+                    </a>
+                {% else %}
+                    <a href="{% url 'tasks:start_sprint' active_sprint.id %}" 
+                    class="btn btn-primary btn-sm fw-bold shadow-sm me-2">
+                        <i class="bi bi-play-fill"></i> Start Sprint
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'tasks:edit_sprint' active_sprint.id %}" class="btn btn-outline-secondary btn-sm rounded-circle">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'tasks:delete_sprint' active_sprint.id %}" 
+                class="btn btn-outline-danger btn-sm rounded-circle" 
+                onclick="return confirm('⚠️ ลบ Sprint นี้จริงไหม?');">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </div>
+            {% endif %}
         </div>
+
+    {% else %}
+        <div class="alert alert-light text-center border-0 py-4">
+            <h5 class="text-muted">✨ ยังไม่ได้เลือก Sprint หรือยังไม่มี Sprint</h5>
+            <p class="small text-muted mb-0">ลองเลือกจากรายการด้านบน หรือสร้างใหม่ได้เลย!</p>
+        </div>
+    {% endif %}
 
         {% if active_sprint %}
         <div class="row g-4">
@@ -269,8 +319,18 @@
         </div>
         {% endif %}
 
-        <div class="mt-5">
-            <h6 class="text-muted fw-bold text-uppercase ls-1 mb-3"><i class="bi bi-archive me-2"></i>Backlog Items</h6>
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+    
+                <h5 class="fw-bold text-secondary mb-0">
+                    <i class="bi bi-archive-fill me-2"></i> BACKLOG ITEMS
+                </h5>
+
+                <a href="{% url 'tasks:add_task' %}?next={{ request.get_full_path|urlencode }}&team_id={{ current_team.id|default:'' }}" 
+                    class="btn btn-primary shadow-sm rounded-pill px-4">
+                    <i class="bi bi-plus-lg"></i> Add New Task
+                </a>
+
+            </div>
             <div id="backlog-list" class="bg-white rounded-4 shadow-sm p-3 drop-zone" data-status="TODO"
                 data-sprint-id="">
 

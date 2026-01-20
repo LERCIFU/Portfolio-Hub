@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Dashboard</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #2d3436;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .glass-card:hover {
+            transform: translateY(-2px);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg glass-nav mb-4 py-3 shadow-sm">
+        <div class="container-fluid px-4">
+            <div class="d-flex align-items-center">
+                <a href="{% url 'tasks:board' %}{% if current_team %}?team_id={{ current_team.id }}{% endif %}" 
+                   class="btn btn-outline-secondary rounded-circle me-3 d-flex align-items-center justify-content-center"
+                   style="width: 40px; height: 40px;">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <span class="navbar-brand fw-bold fs-4 text-primary m-0">
+                    📊 Dashboard Analysis
+                </span>
+            </div>
+            
+            <div class="ms-auto">
+                {% if active_sprint %}
+                    <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
+                        🚀 {{ active_sprint.name }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary px-3 py-2 rounded-pill">No Active Sprint</span>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container px-4 pb-5">
+        
+        {% if active_sprint %}
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="glass-card p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-1 text-uppercase fw-bold">Total Tasks</p>
+                                <h2 class="mb-0 fw-bold">{{ stats.total_tasks }}</h2>
+                            </div>
+                            <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-layers-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="glass-card p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-1 text-uppercase fw-bold">Completed</p>
+                                <h2 class="mb-0 fw-bold text-success">{{ stats.done_tasks }}</h2>
+                            </div>
+                            <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-check-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="glass-card p-3 h-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted small mb-1 text-uppercase fw-bold">Story Points</p>
+                                <h2 class="mb-0 fw-bold text-warning">{{ stats.done_points }} <span class="fs-6 text-muted">/ {{ stats.total_points }}</span></h2>
+                            </div>
+                            <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-lightning-fill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="glass-card p-3 h-100 d-flex flex-column justify-content-center">
+                        <p class="text-muted small mb-1 text-uppercase fw-bold">Sprint Progress</p>
+                        <div class="d-flex justify-content-between align-items-end mb-1">
+                            <h2 class="mb-0 fw-bold text-info">{{ stats.completion_rate }}%</h2>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" 
+                                 style="width: {{ stats.completion_rate }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-5">
+                    <div class="glass-card p-4 h-100">
+                        <h5 class="fw-bold mb-4">🍩 Task Distribution</h5>
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                        <div class="mt-4 text-center small text-muted">
+                            Based on current active sprint tasks
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-7">
+                    <div class="glass-card p-4 h-100">
+                        <h5 class="fw-bold mb-4">📈 Burnup (Tasks vs Done)</h5>
+                        <div style="position: relative; height: 250px; width: 100%;">
+                            <canvas id="pointsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-clipboard-x display-1 text-muted opacity-50"></i>
+                </div>
+                <h3 class="fw-bold text-muted">No Active Sprint Found</h3>
+                <p class="text-secondary">Please start a sprint from the board to see analytics.</p>
+                <a href="{% url 'tasks:board' %}" class="btn btn-primary rounded-pill px-4 mt-3">
+                    Go to Board
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {% if active_sprint %}
+    <script>
+        // 1. Config Doughnut Chart (Status)
+        const ctxStatus = document.getElementById('statusChart');
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['To Do', 'In Progress', 'Done'],
+                datasets: [{
+                    data: [
+                        {{ stats.todo_tasks }}, 
+                        {{ stats.progress_tasks }}, 
+                        {{ stats.done_tasks }}
+                    ],
+                    backgroundColor: [
+                        '#e9ecef', // Grey for Todo
+                        '#0d6efd', // Blue for In Progress
+                        '#198754'  // Green for Done
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // 2. Config Bar Chart (Points/Tasks)
+        const ctxPoints = document.getElementById('pointsChart');
+        new Chart(ctxPoints, {
+            type: 'bar',
+            data: {
+                labels: ['Tasks Count', 'Story Points'],
+                datasets: [
+                    {
+                        label: 'Total',
+                        data: [{{ stats.total_tasks }}, {{ stats.total_points }}],
+                        backgroundColor: '#6c757d',
+                        borderRadius: 5
+                    },
+                    {
+                        label: 'Completed',
+                        data: [{{ stats.done_tasks }}, {{ stats.done_points }}],
+                        backgroundColor: '#198754',
+                        borderRadius: 5
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
+</body>
+</html>

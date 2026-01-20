@@ -82,15 +82,14 @@
                             </div>
                         </div>
 
-                        <div class="mb-4 form-check bg-white p-3 rounded-4 border shadow-sm">
-                            <input type="checkbox" name="is_active" class="form-check-input mt-2 ms-1" id="activeCheck" 
-                                   {% if form.is_active.value %}checked{% endif %}>
-                            <label class="form-check-label fw-bold ms-2" for="activeCheck">
-                                <span class="text-primary">⚡ Start Immediately</span>
-                                <div class="text-muted small fw-normal mt-1" style="font-size: 0.8rem;">
-                                    This will move unfinished tasks from the current sprint to this new one.
-                                </div>
+                        <div class="mb-3 form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label fw-bold" for="{{ form.is_active.id_for_label }}">
+                                🚀 Start Sprint Immediately? (เริ่มทันทีเลยไหม)
                             </label>
+                            <div class="form-text text-muted">
+                                ถ้าติ๊กช่องนี้ Sprint อื่นที่วิ่งอยู่จะถูกปิดอัตโนมัติ
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
